@@ -46,6 +46,8 @@ import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.services.jcr.core.nodetype.ExtendedNodeTypeManager;
 import org.exoplatform.services.jcr.core.nodetype.NodeTypeDataManager;
 
+import com.talan.exoactivitystatistic.UserTrackingBean;
+
 /**
  * Created by The eXo Platform SAS Mar 25, 2014
  */
@@ -401,6 +403,61 @@ public class ActivityStatisticServiceImpl implements ActivityStatisticService {
 
     }
   }
+  
+  
+  public UserTrackingBean getUserActivitiesByDate(String userName, Date date ){
+	  //TODO : implement this 
+	  return null;
+  }
+  
+  
+  public UserTrackingBean getListUserTrackingByDate(String userName,
+			Date fromDate, Date toDate) {
+	  	UserTrackingBean trackbean = new UserTrackingBean();
+	    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
+	    try {
+	    	ManageableRepository currentRepo = this.repositoryService.getCurrentRepository();
+	        Session session = sessionProvider.getSession(ACTIVITY_TRACKING_WORKSPACE_NAME  , currentRepo);	        
+	        QueryManager queryManager = session.getWorkspace().getQueryManager();
+	        String UserUID = getUuidFromUsername(userName, queryManager );
+	        
+        	StringBuilder queryString = new StringBuilder();
+        	// 
+        	// select * from soc:activity  WHERE soc:posterIdentity = '24746b9d7f000101576a01cc45e6e2c2' 
+        	//	AND soc:isComment = 'false'  ORDER BY exo:dateCreated 	
+        	queryString.append("SELECT * FROM " + ACTIVITY_TRACKING_WORKSPACE_PREFIX + ACTIVITY_TRACKING_NODE_TYPE +  
+        			 " WHERE "+ ACTIVITY_TRACKING_WORKSPACE_PREFIX + ACTIVITY_TRACKING_POSTER_USERNAME + "=  ' "  + UserUID + "'" );
+        			 
+         	queryString.append("ORDER BY exo:dateCreated");			
+        	LOG.debug("SQL  statement detected: "+ queryString.toString());
+            QueryImpl trackquery = (QueryImpl) queryManager.createQuery(queryString.toString(), Query.SQL);
+            QueryResult qresult = trackquery.execute();
+            NodeIterator nodeIterator = qresult.getNodes();
+            trackbean.setTotalactivitiesNumber(nodeIterator.getSize());
+            trackbean.setUserName(userName);
+            trackbean.setUserUid(UserUID);
+            while (nodeIterator.hasNext()) {
+                Node node = nodeIterator.nextNode();               
+                // TODO EXTRACT THOSE PROPERTIES NAMES TO PARENT SERVICE and this logic to a function
+                if (node.hasProperty("soc:likes")){
+                	trackbean.addLikes(node.getProperty("soc:likes").getValues().length);
+                }
+                if (node.hasProperty("soc:commenters")){
+                	trackbean.addComments(node.getProperty("soc:commenters").getValues().length);
+                }
+                if (node.hasProperty("soc:isComment")&& node.getProperty("soc:isComment").getBoolean()){
+                	trackbean.addpostedComment(1L);
+                }   
+                
+            }
+            return trackbean ; 
+	    }catch (Exception e ){
+	    	 LOG.info("Error while getting Tracking  Statistic " + e.getMessage(), e);
+	         return null; 
+	    }
+			
+}
+  
   
   private ActivityStatisticBean fillDataToBean(Node node){
     ActivityStatisticBean bean;

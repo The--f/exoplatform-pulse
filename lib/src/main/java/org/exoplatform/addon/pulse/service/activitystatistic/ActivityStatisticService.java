@@ -20,6 +20,8 @@ package org.exoplatform.addon.pulse.service.activitystatistic;
 import java.util.Date;
 import java.util.List;
 
+import com.talan.exoactivitystatistic.UserTrackingBean;
+
 
 /**
  * Created by The eXo Platform SAS
@@ -47,6 +49,21 @@ public interface ActivityStatisticService {
   public static final String ACTIVITY_STATISTIC_SOCIAL_POST_COUNT_TODAY = "exo:socialPostCountToday";
   public static final String ACTIVITY_STATISTIC_EMAIL_NOTIFICATION_COUNT = "exo:emailNotificationCount";
   public static final String ACTIVITY_STATISTIC_EMAIL_NOTIFICATION_COUNT_TODAY = "exo:emailNotificationToday";
+
+  public static final String ACTIVITY_TRACKING_WORKSPACE_NAME= "social";
+  public static final String ACTIVITY_TRACKING_WORKSPACE_PREFIX= "soc:";
+  public static final String ACTIVITY_TRACKING_NODE_TYPE = "activity";
+  public static final String ACTIVITY_TRACKING_LIKES = "likes" ;
+  public static final String ACTIVITY_TRACKING_CREATED_DATE = "exo:dateCreated";
+  public static final String ACTIVITY_TRACKING_MODIFIED_DATE = "exo:dateModified";
+  public static final String ACTIVITY_TRACKING_POSTER_USERNAME = "posterIdentity" ;
+  public static final String ACTIVITY_TRACKING_USERNAME_NODETYPE  = "identitydefinition";
+  public static final String ACTIVITY_TRACKING_USERNAME_PROPERTY_NAME = "exo:name" ; 
+  public static final String ACTIVITY_TRACKING_USER_UID_PROPERTY_NAME = "jcr:uuid";
+  
+  public abstract UserTrackingBean getUserActivitiesByDate(Date date);
+  
+  public abstract UserTrackingBean getListUserTrackingByDate( String userName , Date fromDate ,Date toDate );
   
   public abstract boolean createOrUpdate (ActivityStatisticBean bean) throws Exception;
 
