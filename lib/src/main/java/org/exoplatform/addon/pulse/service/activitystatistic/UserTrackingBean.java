@@ -44,11 +44,17 @@ public class UserTrackingBean {
     
     
     
-    public void addActivity (String type , long number ){
+    /**
+     * Adds an activity and increments its inner value  by number  
+     * @param type
+     * @param number
+     */
+    public void addActivitybyType (String type , long number ){
     	if (this.activityNumberPerType.containsKey(type)){
-    		this.activityNumberPerType.put(type, number);
+    		long v = number+ (long) activityNumberPerType.get(type) ;    		
+    		this.activityNumberPerType.put(type, v);
     	}else{
-    		
+    		this.activityNumberPerType.put(type, number);
     	}
     }
 
